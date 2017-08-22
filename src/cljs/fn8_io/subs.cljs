@@ -8,6 +8,11 @@
    (:name db)))
 
 (re-frame/reg-sub
+ :button-state
+ (fn [db]
+   (:toggle-button db)))
+
+(re-frame/reg-sub
  :active-panel
  (fn [db _]
    (:active-panel db)))

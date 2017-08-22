@@ -9,7 +9,7 @@
   (let [name (re-frame/subscribe [:name])]
     (fn []
       [re-com/title
-       :label (str "Hello from " @name ". This is the future I/O of the fn8 emulator")
+       :label (str "Hello from " @name )
        :level :level1])))
 
 (defn link-to-about-page []
@@ -18,9 +18,23 @@
    :href "#/about"])
 
 (defn home-panel []
-  [re-com/v-box
-   :gap "1em"
-   :children [[home-title] [re-com/p "Outputs; Sound & Graphics. " [:br] "Inputs; 0x0 - 0xF keyboard"] [link-to-about-page]]])
+  (let [toggle-button (re-frame/subscribe [:button-state])]
+    (fn []
+      [re-com/v-box
+       :gap "1em"
+       :children [[home-title]
+                  [re-com/p
+                   "This is the future I/O of the fn8 emulator"
+                   [:br]
+                   "Outputs; Sound & Graphics. "
+                   [:br]
+                   "Inputs; 0x0 - 0xF keyboard"]
+                  [re-com/button
+                   :label (if (:state @toggle-button)
+                            "Stop sound"
+                            "Start sound")
+                   :on-click #(re-frame/dispatch [:toggle-button-state ""])]
+                  [link-to-about-page]]])))
 
 
 ;; about

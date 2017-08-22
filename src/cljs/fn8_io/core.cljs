@@ -1,11 +1,14 @@
 (ns fn8-io.core
-  (:require [reagent.core :as reagent]
+  (:require [reagent.core  :as reagent :refer [atom]]
             [re-frame.core :as re-frame]
+            [fn8-io.db :as db]
             [fn8-io.events]
             [fn8-io.subs]
+            [fn8-io.handlers]
             [fn8-io.routes :as routes]
             [fn8-io.views :as views]
-            [fn8-io.config :as config]))
+            [fn8-io.config :as config]
+            [fn8-io.sound :as sound]))
 
 
 (defn dev-setup []
@@ -20,6 +23,6 @@
 
 (defn ^:export init []
   (routes/app-routes)
-  (re-frame/dispatch-sync [:initialize-db])
+  (re-frame/dispatch-sync [:initialize-db db/default-db])
   (dev-setup)
   (mount-root))

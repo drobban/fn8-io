@@ -2,4 +2,5 @@
 
 (def default-db
   {:name "fn8-io"
+   :files []
    :toggle-button {:state false}})

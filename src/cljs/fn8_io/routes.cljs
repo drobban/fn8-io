@@ -21,6 +21,9 @@
   (defroute "/" []
     (re-frame/dispatch [:set-active-panel :home-panel]))
 
+  (defroute "/files" []
+    (re-frame/dispatch [:set-active-panel :file-panel]))
+
   (defroute "/about" []
     (re-frame/dispatch [:set-active-panel :about-panel]))
 

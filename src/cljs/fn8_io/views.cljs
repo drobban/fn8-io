@@ -3,8 +3,7 @@
             [re-com.core :as re-com]
             [fn8-io.io.files :as files]
             [goog.string :as gstring]
-            [goog.string.format]
-            ))
+            [goog.string.format]))
 
 (defn links []
   [re-com/h-box
@@ -20,23 +19,39 @@
                :href "#/about"]]])
 
 ;; File view
-(defn file-row [[name size]]
-  [re-com/h-box
-   :gap "1em"
-   :children [[re-com/label :label name] [re-com/label :label size]]])
-
-(defn file-box []
+(defn file-row []
   (let [files (re-frame/subscribe [:file-list])]
     (fn []
       [re-com/v-box
-       :gap "1em"
-       :children [[:input {:type "file"
-                           :id "files"
-                           :multiple {}
-                           :on-change (fn [e] (files/show-files e))}]
+       :children [
                   (for [file @files]
-                    (file-row file)
-                    )]])))
+                    [:div
+                     {:key (str (aget file "name"))}
+                     [re-com/h-box
+                      :gap "1em"
+                      :children [
+                                 [re-com/box
+                                  :min-width "150px"
+                                  :child [re-com/label :label (str (aget file "name"))]]
+                                 [re-com/label :label (str (aget file "size"))]
+                                 ]]])]])))
+
+(defn file-box []
+  (fn []
+    [re-com/v-box
+     :gap "1em"
+     :children [
+                [:label {:for "files"}
+                [re-com/md-circle-icon-button
+                 :md-icon-name "zmdi-upload"]
+                 ]
+                [:input
+                 {:type "file"
+                  :style {:display "none"}
+                  :id "files"
+                  ;; :multiple {}
+                  :on-change (fn [e] (files/show-files e))}]
+                [file-row]]]))
 
 
   ;; [re-com/v-box

@@ -66,7 +66,6 @@
                   :on-change (fn [e] (show-files e))}]
                 [file-row]]]))
 
-
 (defn file-panel []
   (let [toggle-button (re-frame/subscribe [:button-state])]
     (fn []
@@ -78,8 +77,7 @@
                    :level :level1]
                   [file-box]]])))
 
-;; home
-
+;; Screen-panel
 (defn home-title []
   (let [name (re-frame/subscribe [:name])]
     (fn []
@@ -87,26 +85,38 @@
        :label (str "Hello from " @name )
        :level :level1])))
 
+;; (defn screen-panel []
+;;   (let [toggle-button (re-frame/subscribe [:button-state])]
+;;     (fn []
+;;       (println (screen/test-print))
+;;       [re-com/v-box
+;;        :gap "1em"
+;;        :children [[links]
+;;                   [home-title]
+;;                   [re-com/p
+;;                    "This is the future I/O of the fn8 emulator"
+;;                    [:br]
+;;                    "Outputs; Sound & Graphics. "
+;;                    [:br]
+;;                    "Inputs; 0x0 - 0xF keyboard"]
+;;                   [re-com/button
+;;                    :label (if (:state @toggle-button)
+;;                             "Stop sound"
+;;                             "Start sound")
+;;                    :on-click #(re-frame/dispatch [:toggle-button-state ""])]]])))
+
 (defn screen-panel []
   (let [toggle-button (re-frame/subscribe [:button-state])]
+    ;; (.log js/console test-image)
     (fn []
-      (println (screen/test-print))
       [re-com/v-box
        :gap "1em"
        :children [[links]
-                  [home-title]
-                  [re-com/p
-                   "This is the future I/O of the fn8 emulator"
-                   [:br]
-                   "Outputs; Sound & Graphics. "
-                   [:br]
-                   "Inputs; 0x0 - 0xF keyboard"]
+                  [re-com/box
+                   :child [screen/canvas {:id "Screen" :width 640 :height 320}]]
                   [re-com/button
-                   :label (if (:state @toggle-button)
-                            "Stop sound"
-                            "Start sound")
-                   :on-click #(re-frame/dispatch [:toggle-button-state ""])]]])))
-
+                   :label "refresh"
+                   :on-click #(gfx/display gfx/test-buffer "Screen" 10)]]])))
 
 ;; about
 

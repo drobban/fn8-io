@@ -1,7 +1,9 @@
 (ns fn8-io.views
   (:require [re-frame.core :as re-frame]
             [re-com.core :as re-com]
-            [fn8-io.io.files :as files]
+            [fn8-io.io.files :as files :refer [file-data]]
+            [fn8-io.io.gfx :as gfx :refer [test-buffer]]
+            [fn8-io.views.screen :as screen]
             [goog.string :as gstring]
             [goog.string.format]))
 
@@ -19,12 +21,23 @@
                :href "#/about"]]])
 
 ;; File view
+(defn obj->vec [obj]
+  "Put object properties into a vector"
+  (vec (map (fn [k] (aget obj k)) (.keys js/Object obj))))
+
+(defn show-files
+  [e]
+  (let [files (obj->vec (.-files (.-target e)))]
+    (files/put-upload e)
+    (re-frame/dispatch [:set-file-list files])))
+
 (defn file-row []
   (let [files (re-frame/subscribe [:file-list])]
     (fn []
+      ;; (println (take (- 0xf00 0x200) (concat @file-data (repeat 0))))
+      (println (str "Rom loaded: " (take (- 0xf00 0x200) (concat @file-data (repeat 0)))))
       [re-com/v-box
-       :children [
-                  (for [file @files]
+       :children [(for [file @files]
                     [:div
                      {:key (str (aget file "name"))}
                      [re-com/h-box
@@ -50,15 +63,9 @@
                   :style {:display "none"}
                   :id "files"
                   ;; :multiple {}
-                  :on-change (fn [e] (files/show-files e))}]
+                  :on-change (fn [e] (show-files e))}]
                 [file-row]]]))
 
-
-  ;; [re-com/v-box
-  ;;  :gap "1em"
-  ;;  :children [(for [file @files]
-  ;;               [:div {:key file} (str file)])]]
-  ;; ]
 
 (defn file-panel []
   (let [toggle-button (re-frame/subscribe [:button-state])]
@@ -80,9 +87,10 @@
        :label (str "Hello from " @name )
        :level :level1])))
 
-(defn home-panel []
+(defn screen-panel []
   (let [toggle-button (re-frame/subscribe [:button-state])]
     (fn []
+      (println (screen/test-print))
       [re-com/v-box
        :gap "1em"
        :children [[links]
@@ -117,7 +125,7 @@
 
 (defn- panels [panel-name]
   (case panel-name
-    :home-panel [home-panel]
+    :screen-panel [screen-panel]
     :about-panel [about-panel]
     :file-panel [file-panel]
     [:div]))

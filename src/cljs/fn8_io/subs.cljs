@@ -8,6 +8,11 @@
    (:files db)))
 
 (re-frame/reg-sub
+ :rom-data
+ (fn [db]
+   (:rom db)))
+
+(re-frame/reg-sub
  :name
  (fn [db]
    (:name db)))

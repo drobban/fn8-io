@@ -7,8 +7,7 @@
             [fn8-io.handlers]
             [fn8-io.routes :as routes]
             [fn8-io.views :as views]
-            [fn8-io.config :as config]
-            [fn8-io.sound :as sound]))
+            [fn8-io.config :as config]))
 
 
 (defn dev-setup []

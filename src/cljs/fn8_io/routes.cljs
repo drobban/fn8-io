@@ -19,7 +19,7 @@
   ;; --------------------
   ;; define routes here
   (defroute "/" []
-    (re-frame/dispatch [:set-active-panel :home-panel]))
+    (re-frame/dispatch [:set-active-panel :screen-panel]))
 
   (defroute "/files" []
     (re-frame/dispatch [:set-active-panel :file-panel]))

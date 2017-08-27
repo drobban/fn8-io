@@ -8,6 +8,7 @@
             [fn8-io.routes :as routes]
             [fn8-io.views :as views]
             [fn8-io.config :as config]
+            [fn8-io.io.gfx :as gfx]
             [fn8-io.io.keyboard :as keyboard]))
 
 
@@ -26,4 +27,5 @@
   (routes/app-routes)
   (re-frame/dispatch-sync [:initialize-db db/default-db])
   (dev-setup)
-  (mount-root))
+  (mount-root)
+  (js/setInterval #(gfx/display gfx/test-buffer "Screen" 10) 17))

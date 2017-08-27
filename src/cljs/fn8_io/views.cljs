@@ -34,7 +34,6 @@
 (defn file-row []
   (let [files (re-frame/subscribe [:file-list])]
     (fn []
-      ;; (println (take (- 0xf00 0x200) (concat @file-data (repeat 0))))
       (println (str "Rom loaded: " (take (- 0xf00 0x200) (concat @file-data (repeat 0)))))
       [re-com/v-box
        :children [(for [file @files]
@@ -46,21 +45,19 @@
                                  [re-com/box
                                   :min-width "150px"
                                   :child [re-com/label :label (str (aget file "name"))]]
-                                 [re-com/label :label (str (aget file "size"))]
-                                 ]]])]])))
+                                 [re-com/label :label (str (aget file "size") " bytes")]]]])]])))
 
 (defn file-box []
   (fn []
     [re-com/v-box
      :gap "1em"
-     :children [
-                [:label {:for "files"}
-                [re-com/md-circle-icon-button
-                 :md-icon-name "zmdi-upload"]
-                 ]
+     :children [;; [:label {:for "files"}
+                ;; [re-com/md-circle-icon-button
+                 ;; :md-icon-name "zmdi-upload"]
+                 ;; ]
                 [:input
                  {:type "file"
-                  :style {:display "none"}
+                  ;; :style {:display "none"}
                   :id "files"
                   ;; :multiple {}
                   :on-change (fn [e] (show-files e))}]
@@ -71,10 +68,10 @@
     (fn []
       [re-com/v-box
        :gap "1em"
-       :children [[links]
-                  [re-com/title
-                   :label "File"
+       :children [[re-com/title
+                   :label "File selection"
                    :level :level1]
+                  [re-com/p "Select Chip-8 rom file"]
                   [file-box]]])))
 
 ;; Screen-panel
@@ -106,14 +103,12 @@
 ;;                    :on-click #(re-frame/dispatch [:toggle-button-state ""])]]])))
 
 (defn screen-panel []
-  (let [toggle-button (re-frame/subscribe [:button-state])
-        key-state (re-frame/subscribe [:active-key])]
+  (let [toggle-button (re-frame/subscribe [:button-state])]
     (fn []
       [re-com/v-box
        :gap "1em"
-       :children [[links]
-                  [re-com/label
-                   :label (str "Active key: " @key-state)]
+       :children [;; [re-com/label
+                  ;;  :label (str "Active key: " @key-state)]
                   [re-com/box
                    :child [screen/canvas {:id "Screen" :width 640 :height 320}]]
                   [re-com/button
@@ -121,7 +116,6 @@
                    :on-click #(gfx/display gfx/test-buffer "Screen" 10)]]])))
 
 ;; about
-
 (defn about-title []
   [re-com/title
    :label "Work in progress...."
@@ -130,24 +124,43 @@
 (defn about-panel []
   [re-com/v-box
    :gap "1em"
-   :children [[links]
-              [about-title]]])
+   :children [[about-title]]])
 
 ;; main
-
 (defn- panels [panel-name]
   (case panel-name
     :screen-panel [screen-panel]
     :about-panel [about-panel]
     :file-panel [file-panel]
+    :delete [screen-panel]
+    :start [screen-panel]
     [:div]))
 
 (defn show-panel [panel-name]
   [panels panel-name])
 
+(def tab-icons
+  [{:id :screen-panel    :label [:i {:class "zmdi zmdi-home"}]}
+   {:id :file-panel      :label [:i {:class "zmdi zmdi-upload"}]}
+   {:id :delete          :label [:i {:class "zmdi zmdi-delete"}]}
+   {:id :start           :label [:i {:class "zmdi zmdi-play"}]}
+   {:id :about-panel     :label [:i {:class "zmdi zmdi-info"}]}])
+
+(defn tabs
+  [tab]
+  [re-com/h-box
+   :align :center
+   :gap "8px"
+   :children [[re-com/horizontal-bar-tabs
+               :model     tab
+               :tabs      tab-icons
+               :on-change #(re-frame/dispatch [:set-tab %])]]])
+
 (defn main-panel []
-  (let [active-panel (re-frame/subscribe [:active-panel])]
+  (let [active-panel (re-frame/subscribe [:active-panel])
+        active-tab (re-frame/subscribe [:tab])]
     (fn []
       [re-com/v-box
        :height "100%"
-       :children [[panels @active-panel]]])))
+       :children [[tabs active-tab]
+                  [panels @active-tab]]])))

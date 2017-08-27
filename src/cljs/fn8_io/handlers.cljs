@@ -20,6 +20,12 @@
    (assoc db :rom rom)))
 
 (register-handler
+ :set-tab
+ trim-v
+ (fn [db [tab]]
+   (assoc db :tab tab)))
+
+(register-handler
  :set-key
  trim-v
  (fn [db [[action key]]]

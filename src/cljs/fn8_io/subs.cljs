@@ -18,6 +18,11 @@
    (:active-key db)))
 
 (re-frame/reg-sub
+ :tab
+ (fn [db]
+   (:tab db)))
+
+(re-frame/reg-sub
  :name
  (fn [db]
    (:name db)))

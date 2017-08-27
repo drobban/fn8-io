@@ -106,12 +106,14 @@
 ;;                    :on-click #(re-frame/dispatch [:toggle-button-state ""])]]])))
 
 (defn screen-panel []
-  (let [toggle-button (re-frame/subscribe [:button-state])]
-    ;; (.log js/console test-image)
+  (let [toggle-button (re-frame/subscribe [:button-state])
+        key-state (re-frame/subscribe [:active-key])]
     (fn []
       [re-com/v-box
        :gap "1em"
        :children [[links]
+                  [re-com/label
+                   :label (str "Active key: " @key-state)]
                   [re-com/box
                    :child [screen/canvas {:id "Screen" :width 640 :height 320}]]
                   [re-com/button

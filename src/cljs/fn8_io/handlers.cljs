@@ -20,6 +20,17 @@
    (assoc db :rom rom)))
 
 (register-handler
+ :set-key
+ trim-v
+ (fn [db [[action key]]]
+   (cond
+     (= action :set) (assoc db :active-key key)
+     (= action :unset) (if (= (:active-key db) key)
+                         (assoc db :active-key nil)
+                         db)
+     :else (assoc db :active-key "undefined action"))))
+
+(register-handler
  :toggle-button-state
  trim-v
  (fn [db _]

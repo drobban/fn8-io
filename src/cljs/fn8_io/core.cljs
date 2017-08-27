@@ -7,7 +7,8 @@
             [fn8-io.handlers]
             [fn8-io.routes :as routes]
             [fn8-io.views :as views]
-            [fn8-io.config :as config]))
+            [fn8-io.config :as config]
+            [fn8-io.io.keyboard :as keyboard]))
 
 
 (defn dev-setup []
@@ -18,7 +19,8 @@
 (defn mount-root []
   (re-frame/clear-subscription-cache!)
   (reagent/render [views/main-panel]
-                  (.getElementById js/document "app")))
+                  (.getElementById js/document "app"))
+  (keyboard/keyboard-init! :set-key))
 
 (defn ^:export init []
   (routes/app-routes)

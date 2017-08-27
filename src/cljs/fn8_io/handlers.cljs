@@ -36,12 +36,12 @@
                          db)
      :else (assoc db :active-key "undefined action"))))
 
-(register-handler
- :toggle-button-state
- trim-v
- (fn [db _]
-   (do
-     (if (get-in db [:toggle-button :state])
-       (stop-sound!)
-       (start-sound!))
-     (update-in db [:toggle-button :state] not))))
+;; (register-handler
+;;  :toggle-button-state
+;;  trim-v
+;;  (fn [db _]
+;;    (do
+;;      (if (get-in db [:toggle-button :state])
+;;        (stop-sound!)
+;;        (start-sound!))
+;;      (update-in db [:toggle-button :state] not))))

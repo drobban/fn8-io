@@ -39,6 +39,6 @@
 
 ;; sit around in a loop waiting for a string to appear in the file-reads channel and put it in the state atom to be read by reagent and rendered on the page.
 (go-loop []
-  (reset! file-data (map #(.charCodeAt %) (<! file-reads)))
+  (reset! file-data (vec (map #(.charCodeAt %) (<! file-reads))))
   (recur))
 

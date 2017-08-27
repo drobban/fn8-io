@@ -28,4 +28,4 @@
   (re-frame/dispatch-sync [:initialize-db db/default-db])
   (dev-setup)
   (mount-root)
-  (js/setInterval #(gfx/display gfx/test-buffer "Screen" 10) 17))
+  (js/setInterval #(gfx/display @gfx/gfx-atom "Screen" 10) 17))

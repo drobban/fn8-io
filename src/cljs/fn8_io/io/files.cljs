@@ -4,7 +4,7 @@
             [cljs.core.async :refer [put! chan <! >!]])
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
-(def file-data (atom " "))
+(def file-data (atom nil))
 
 ;; transducer to stick on a core-async channel to manipulate all the weird javascript
 ;; event objects --- basically just takes the array of file objects or something

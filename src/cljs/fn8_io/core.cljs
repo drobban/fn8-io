@@ -37,7 +37,6 @@
   (async/<! (async/timeout 17))
   (gfx/display @gfx/gfx-atom "Screen" 10)
   (recur))
-;; (js/setInterval #(gfx/display gfx/gfx-atom "Screen" 10) 17)
 
 (go-loop []
   (let [command (async/<! machine/sim-com)]
@@ -58,11 +57,13 @@
                                        (reset! machine/loaded machine/internals)
                                        (swap!  machine/loaded assoc :filename file-name)
                                        (reset! machine/sim-state nil)
-                                       (reset! machine/loaded (machine/read-rom file @machine/loaded))))
+                                       (reset! machine/loaded (machine/read-rom file @machine/loaded))
+                                       (re-frame/dispatch [:filename file-name])))
       (= :stop @machine/sim-state) (do
                                      (reset! machine/sim-state nil)
                                      (reset! machine/loaded machine/internals)
-                                     (reset! gfx/gfx-atom (machine/show-gfx-buff @machine/loaded)))
+                                     (reset! gfx/gfx-atom (machine/show-gfx-buff @machine/loaded))
+                                     (re-frame/dispatch [:filename ""]))
       (= :pause @machine/sim-state) (reset! machine/sim-state nil)
       :else (async/<! (async/timeout 1000)))
     (recur)))

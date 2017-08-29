@@ -13,6 +13,11 @@
    (:rom db)))
 
 (re-frame/reg-sub
+ :filename
+ (fn [db]
+   (:filename db)))
+
+(re-frame/reg-sub
  :active-key
  (fn [db]
    (:active-key db)))

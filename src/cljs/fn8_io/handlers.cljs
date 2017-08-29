@@ -8,10 +8,10 @@
    state))
 
 (register-handler
- :set-file-list
+ :filename
  trim-v
- (fn [db [files]]
-   (assoc db :files files)))
+ (fn [db [filename]]
+   (assoc db :filename filename)))
 
 (register-handler
  :set-rom

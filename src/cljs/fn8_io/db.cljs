@@ -4,6 +4,6 @@
   {:name "fn8-io"
    :active-key ""
    :tab :screen-panel
-   :files []
+   :filename ""
    :rom ""
    :toggle-button {:state false}})

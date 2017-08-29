@@ -18,8 +18,7 @@
 (defn show-files
   [e]
   (let [files (obj->vec (.-files (.-target e)))]
-    (files/put-upload e)
-    (re-frame/dispatch [:set-file-list files])))
+    (files/put-upload e)))
 
 (defn file-row []
   (let [files (re-frame/subscribe [:file-list])]
@@ -70,6 +69,10 @@
                :on-click onclick-fn
                :on-change onchange-fn}]]]))
 
+(defn file-label []
+  (let [filename (re-frame/subscribe [:filename])]
+    (fn [] [re-com/label :label @filename])))
+
 (defn screen-panel []
   (let []
     (fn []
@@ -90,7 +93,7 @@
                               [zmdi-button "zmdi-pause" #(async/put! sim-com :pause)]
                               [zmdi-button "zmdi-stop" #(async/put! sim-com :stop)]
                               [zmdi-file-button "zmdi-file" #(async/put! sim-com :load) (fn[e](show-files e))]
-                              [re-com/label :label (:filename @loaded)]]]]])))
+                              [file-label]]]]])))
 
 ;; main
 (defn main-panel []

@@ -12,11 +12,8 @@
             [fn8-io.io.keyboard :as keyboard]
             [fn8-io.machine.machine :as machine]
             [cljs.core.async :as async]
-            [fn8-io.io.files :as files]
-            )
-
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  )
+            [fn8-io.io.files :as files])
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn dev-setup []
   (when config/debug?
@@ -36,11 +33,6 @@
   (mount-root))
 
 
-(defonce loaded (atom machine/internals))
-(def sim-com (async/chan (async/buffer 1)))
-(def sim-state (atom nil))
-
-
 (go-loop []
   (async/<! (async/timeout 17))
   (gfx/display @gfx/gfx-atom "Screen" 10)
@@ -48,23 +40,29 @@
 ;; (js/setInterval #(gfx/display gfx/gfx-atom "Screen" 10) 17)
 
 (go-loop []
-  (let [command (async/<! sim-com)]
-    (reset! sim-state command))
+  (let [command (async/<! machine/sim-com)]
+    (reset! machine/sim-state command))
   (recur))
 
 (go-loop []
-  (async/<! (async/timeout 5))
-  (cond
-    (= :start @sim-state) (do
-                            (swap! loaded #(-> % machine/chip-cpu (update :pc + 2)))
-                            (reset! gfx/gfx-atom (machine/show-gfx-buff @loaded)))
-    (= :load @sim-state) (do
-                           (reset! sim-state nil)
-                           (reset! loaded (machine/read-rom @files/file-data @loaded))
-                           )
-    (= :stop @sim-state) (do
-                           (reset! sim-state nil)
-                           (reset! loaded machine/internals)
-                           (reset! gfx/gfx-atom (machine/show-gfx-buff @loaded)))
-    :else nil)
-  (recur))
+  (let []
+    (cond
+      (= :start @machine/sim-state) (doseq [i (range 50)]
+                                      (swap! machine/loaded #(-> % machine/chip-cpu (update :pc + 2)))
+                                      (reset! gfx/gfx-atom (machine/show-gfx-buff @machine/loaded))
+                                      (if (= i 49)
+                                        (async/<! (async/timeout 20))))
+      (= :load @machine/sim-state) (let [file (async/<! files/done-file)
+                                         file-name (async/<! files/name-chan)]
+                                     (do
+                                       (reset! machine/loaded machine/internals)
+                                       (swap!  machine/loaded assoc :filename file-name)
+                                       (reset! machine/sim-state nil)
+                                       (reset! machine/loaded (machine/read-rom file @machine/loaded))))
+      (= :stop @machine/sim-state) (do
+                                     (reset! machine/sim-state nil)
+                                     (reset! machine/loaded machine/internals)
+                                     (reset! gfx/gfx-atom (machine/show-gfx-buff @machine/loaded)))
+      (= :pause @machine/sim-state) (reset! machine/sim-state nil)
+      :else (async/<! (async/timeout 1000)))
+    (recur)))

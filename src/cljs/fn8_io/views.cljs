@@ -1,24 +1,14 @@
 (ns fn8-io.views
   (:require [re-frame.core :as re-frame]
             [re-com.core :as re-com]
-            [fn8-io.io.files :as files :refer [file-data]]
-            [fn8-io.io.gfx :as gfx :refer [test-buffer]]
+            [fn8-io.io.files :as files]
+            [fn8-io.io.gfx :as gfx]
+            [fn8-io.machine.machine :refer [sim-com loaded]]
             [fn8-io.views.screen :as screen]
             [goog.string :as gstring]
-            [goog.string.format]))
-
-;; (defn links []
-;;   [re-com/h-box
-;;    :gap "1em"
-;;    :children [[re-com/hyperlink-href
-;;                :label "Screen"
-;;                :href "#/"]
-;;               [re-com/hyperlink-href
-;;                :label "Upload file"
-;;                :href "#/files"]
-;;               [re-com/hyperlink-href
-;;                :label "About"
-;;                :href "#/about"]]])
+            [goog.string.format]
+            [cljs.core.async :as async]
+            ))
 
 ;; File view
 (defn obj->vec [obj]
@@ -47,91 +37,68 @@
                                   :child [re-com/label :label (str (aget file "name"))]]
                                  [re-com/label :label (str (aget file "size") " bytes")]]]])]])))
 
-(defn file-box []
-  (fn []
-    [re-com/v-box
-     :gap "1em"
-     :children [[:input
-                 {:type "file"
-                  :id "files"
-                  :on-change (fn [e] (show-files e))}]
-                [file-row]]]))
+;; Button
+(defn zmdi-button
+  []
+  (fn[zmdi-type onclick-fn]
+    [re-com/box
+     :justify :center
+     :align :center
+     :width "40px"
+     :height "40px"
+     :class (str "btn btn-default zmdi " zmdi-type)
+     :attr {:on-click onclick-fn}
+     :child [:div]]
+    ))
 
-(defn file-panel []
-  (let [toggle-button (re-frame/subscribe [:button-state])]
-    (fn []
-      [re-com/v-box
-       :gap "1em"
-       :children [[re-com/title
-                   :label "File selection"
-                   :level :level1]
-                  [re-com/p "Select Chip-8 rom file"]
-                  [file-box]]])))
-
-;; Screen-panel
-(defn home-title []
-  (let [name (re-frame/subscribe [:name])]
-    (fn []
-      [re-com/title
-       :label (str "Hello from " @name )
-       :level :level1])))
+(defn zmdi-file-button
+  []
+  (fn[zmdi-type onclick-fn onchange-fn]
+    [:label {:for "files"
+             :style {:margin "0px"}}
+     [re-com/box
+      :justify :center
+      :align :center
+      :width "40px"
+      :height "40px"
+      :class (str "btn btn-default zmdi " zmdi-type)
+      ;; :attr {:for "files"}
+      :child [:input
+              {:type "file"
+               :id "files"
+               :style {:display "none"}
+               :on-click onclick-fn
+               :on-change onchange-fn}]]]))
 
 (defn screen-panel []
-  (let [toggle-button (re-frame/subscribe [:button-state])]
+  (let []
     (fn []
       [re-com/v-box
-       :gap "1em"
+       :gap "5px"
        :width "100%"
        :align :center
        :children [[re-com/box
-                   :child [screen/canvas {:id "Screen" :width 640 :height 320}]]]])))
-
-;; about
-(defn about-title []
-  [re-com/title
-   :label "Work in progress...."
-   :level :level1])
-
-(defn about-panel []
-  [re-com/v-box
-   :gap "1em"
-   :children [[about-title]]])
+                   :child [screen/canvas {:id "Screen" :width 640 :height 320}]]
+                  [re-com/h-box
+                   :align :center
+                   :gap "2px"
+                   :width "640px"
+                   :height "50px"
+                   :style {:background "#f5f5f5"
+                           :border "1px solid #cfcfcf"}
+                   :children [[zmdi-button "zmdi-play" #(async/put! sim-com :start)]
+                              [zmdi-button "zmdi-pause" #(async/put! sim-com :pause)]
+                              [zmdi-button "zmdi-stop" #(async/put! sim-com :stop)]
+                              [zmdi-file-button "zmdi-file" #(async/put! sim-com :load) (fn[e](show-files e))]
+                              [re-com/label :label (:filename @loaded)]]]]])))
 
 ;; main
-(defn- panels [panel-name]
-  (case panel-name
-    :screen-panel [screen-panel]
-    :about-panel [about-panel]
-    :file-panel [file-panel]
-    [:div]))
-
-(defn show-panel [panel-name]
-  [panels panel-name])
-
-(def tab-icons
-  [{:id :screen-panel    :label [:i {:class "zmdi zmdi-home"}]}
-   {:id :file-panel      :label [:i {:class "zmdi zmdi-upload"}]}
-   {:id :about-panel     :label [:i {:class "zmdi zmdi-info"}]}])
-
-(defn tabs
-  [tab]
-  [re-com/h-box
-   :align :center
-   :justify :center
-   :width "100%"
-   :gap "8px"
-   :children [[re-com/horizontal-bar-tabs
-               :model     tab
-               :tabs      tab-icons
-               :on-change #(re-frame/dispatch [:set-tab %])]]])
-
 (defn main-panel []
-  (let [active-panel (re-frame/subscribe [:active-panel])
-        active-tab (re-frame/subscribe [:tab])]
+  (let []
     (fn []
       [re-com/v-box
        :gap "1em"
        :width "100%"
        :height "100%"
-       :children [[tabs active-tab]
-                  [panels @active-tab]]])))
+       :style {:padding-top "20px"}
+       :children [[screen-panel]]])))

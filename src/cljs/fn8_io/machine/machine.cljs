@@ -1,12 +1,18 @@
 (ns fn8-io.machine.machine
-  (:require [clojure.core.match :refer [match]]))
+  (:require [clojure.core.match :refer [match]]
+            [fn8-io.io.gfx :as gfx]
+            ;; [fn8-io.io.files :as files]
+            [cljs.core.async :as async]
+            )
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
 ;; Supported input is a hexkeybord range 0 to F
 ;; Programs start at 0x200
 ;; Display buffer at 0xF00
 ;; Stack at 0xEA0
 
-(def internals {:pc 0x200
+(def internals {:filename ""
+                :pc 0x200
                 :input nil
                 :delay-timer 0
                 :sound-timer 0
@@ -419,7 +425,7 @@
            [0x2 _ _] (call m addr)
            [0x3 _ _] (skip-if-val m = lfb sb)
            [0x4 _ _] (skip-if-val m not= lfb sb)
-           [0x5 _ _] (skip-if-vreg m = lfb sb)
+           [0x5 _ _] (skip-if-vreg m = lfb msb)
            [0x6 _ _] (set-vreg m lfb sb)
            [0x7 _ _] (add-to-vreg m lfb sb)
            [0x8 _ 0x0] (set-vreg-xy m lfb msb)
@@ -431,7 +437,7 @@
            [0x8 _ 0x6] (vreg-shift-right m lfb)
            [0x8 _ 0x7] (set-vreg-subx m lfb msb)
            [0x8 _ 0xe] (vreg-shift-left m lfb)
-           [0x9 _ 0x0] (skip-if-vreg m not= lfb sb)
+           [0x9 _ 0x0] (skip-if-vreg m not= lfb msb)
            [0xa _ _] (set-ireg m addr)
            [0xb _ _] (jump-reg m addr)
            [0xc _ _] (set-vreg-rand m lfb sb)
@@ -463,3 +469,9 @@
 (defn show-gfx-buff
   [m]
   (mapv vec (partition 64 (apply concat (mapv unpack-to-vector (subvec (:memory m) 0xF00 0x1000))))))
+
+(defonce loaded (atom internals))
+(def sim-com (async/chan (async/buffer 1)))
+(def sim-state (atom nil))
+
+

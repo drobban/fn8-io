@@ -1,9 +1,7 @@
 (ns fn8-io.machine.machine
   (:require [clojure.core.match :refer [match]]
             [fn8-io.io.gfx :as gfx]
-            ;; [fn8-io.io.files :as files]
-            [cljs.core.async :as async]
-            )
+            [cljs.core.async :as async])
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
 ;; Supported input is a hexkeybord range 0 to F
@@ -75,7 +73,7 @@
         end (subvec board_row
                     (+ (max 0 pos_col) (count (trim_into board_row brick_row pos_col)))
                     (count board_row))]
-    (vec (concat beginning (map bit-or selected (trim_into board_row brick_row pos_col)) end))))
+    (vec (concat beginning (map bit-xor selected (trim_into board_row brick_row pos_col)) end))))
 
 (defn brick_position [gameboard brick pos_col pos_row]
   "Merges brick into gameboard at position row & col"
@@ -477,5 +475,3 @@
 (defonce loaded (atom internals))
 (def sim-com (async/chan (async/buffer 1)))
 (def sim-state (atom nil))
-
-

@@ -48,7 +48,7 @@
     (async/<! (async/timeout 1))
     (condp = @machine/sim-state
       :start (do
-               (swap! machine/loaded #(nth 10 (iterate machine/step-machine %)))
+               (swap! machine/loaded #(nth (iterate machine/step-machine %) 10))
                (reset! gfx/gfx-atom (machine/show-gfx-buff @machine/loaded)))
       :load (let [file (async/<! files/done-file)
                   file-name (async/<! files/name-chan)]

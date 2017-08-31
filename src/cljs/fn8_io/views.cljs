@@ -7,8 +7,7 @@
             [fn8-io.views.screen :as screen]
             [goog.string :as gstring]
             [goog.string.format]
-            [cljs.core.async :as async]
-            ))
+            [cljs.core.async :as async]))
 
 ;; File view
 (defn obj->vec [obj]
@@ -47,11 +46,9 @@
      :height "40px"
      :class (str "btn btn-default zmdi " zmdi-type)
      :attr {:on-click onclick-fn}
-     :child [:div]]
-    ))
+     :child [:div]]))
 
-(defn zmdi-file-button
-  []
+(defn zmdi-file-button []
   (fn[zmdi-type onclick-fn onchange-fn]
     [:label {:for "files"
              :style {:margin "0px"}}

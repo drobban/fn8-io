@@ -176,7 +176,7 @@
   Adds NN to Vreg(x)
   "
   [m x value]
-  (update-in m [:vreg x] + value))
+  (update-in m [:vreg x] #(mod (+ % value) 0x100)))
 
 (defn set-vreg-xy
   "
@@ -454,6 +454,10 @@
            [0xf 0x55 _] (vreg-dump m lfb)
            [0xf 0x65 _] (vreg-load m lfb)
            :else m)))
+
+(defn step-machine
+  [m]
+  (-> m chip-cpu (update :pc + 2)))
 
 (defn read-rom
   "

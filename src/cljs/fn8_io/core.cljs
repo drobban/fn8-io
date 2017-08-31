@@ -32,10 +32,10 @@
   (dev-setup)
   (mount-root))
 
-
 (go-loop []
   (async/<! (async/timeout 17))
   (gfx/display @gfx/gfx-atom "Screen" 10)
+  (swap! machine/loaded update :delay-timer dec)
   (recur))
 
 (go-loop []
@@ -45,25 +45,25 @@
 
 (go-loop []
   (let []
-    (cond
-      (= :start @machine/sim-state) (doseq [i (range 50)]
-                                      (swap! machine/loaded #(-> % machine/chip-cpu (update :pc + 2)))
-                                      (reset! gfx/gfx-atom (machine/show-gfx-buff @machine/loaded))
-                                      (if (= i 49)
-                                        (async/<! (async/timeout 20))))
-      (= :load @machine/sim-state) (let [file (async/<! files/done-file)
-                                         file-name (async/<! files/name-chan)]
-                                     (do
-                                       (reset! machine/loaded machine/internals)
-                                       (swap!  machine/loaded assoc :filename file-name)
-                                       (reset! machine/sim-state nil)
-                                       (reset! machine/loaded (machine/read-rom file @machine/loaded))
-                                       (re-frame/dispatch [:filename file-name])))
-      (= :stop @machine/sim-state) (do
-                                     (reset! machine/sim-state nil)
-                                     (reset! machine/loaded machine/internals)
-                                     (reset! gfx/gfx-atom (machine/show-gfx-buff @machine/loaded))
-                                     (re-frame/dispatch [:filename ""]))
-      (= :pause @machine/sim-state) (reset! machine/sim-state nil)
-      :else (async/<! (async/timeout 1000)))
+    (async/<! (async/timeout 1))
+    (condp = @machine/sim-state
+      :start (do
+               (swap! machine/loaded #(nth 10 (iterate machine/step-machine %)))
+               (reset! gfx/gfx-atom (machine/show-gfx-buff @machine/loaded)))
+      :load (let [file (async/<! files/done-file)
+                  file-name (async/<! files/name-chan)]
+              (reset! machine/loaded machine/internals)
+              (swap!  machine/loaded assoc :filename file-name)
+              (reset! machine/sim-state nil)
+              (reset! machine/loaded (machine/read-rom file @machine/loaded))
+              (re-frame/dispatch [:filename file-name]))
+      :stop  (do
+               (reset! machine/sim-state nil)
+               (reset! machine/loaded machine/internals)
+               (reset! gfx/gfx-atom (machine/show-gfx-buff @machine/loaded))
+               (re-frame/dispatch [:filename ""]))
+      :pause  (reset! machine/sim-state nil)
+      nil)
     (recur)))
+
+;; (swap! machine/loaded #((nth (iterate (fn[m](-> m machine/chip-cpu (update :pc + 2))) %) 2000)))

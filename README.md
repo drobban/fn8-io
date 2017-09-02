@@ -29,7 +29,7 @@ To start running the program, you simply click the play icon.
 Probably, yes.
 
 ### Why?
-Wouldn't it be booring to just have an fn8 interpreter consuming energy without a convinient way using it?
+Wouldn't it be booring to just have an fn8 interpreter consuming energy without a convenient way using it?
 
 
 ## License

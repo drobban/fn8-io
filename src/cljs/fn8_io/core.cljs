@@ -24,7 +24,7 @@
   (re-frame/clear-subscription-cache!)
   (reagent/render [views/main-panel]
                   (.getElementById js/document "app"))
-  (keyboard/keyboard-init! :set-key))
+  (keyboard/keyboard-init! machine/loaded))
 
 (defn ^:export init []
   (routes/app-routes)

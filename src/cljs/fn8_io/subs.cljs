@@ -18,11 +18,6 @@
    (:filename db)))
 
 (re-frame/reg-sub
- :active-key
- (fn [db]
-   (:active-key db)))
-
-(re-frame/reg-sub
  :tab
  (fn [db]
    (:tab db)))

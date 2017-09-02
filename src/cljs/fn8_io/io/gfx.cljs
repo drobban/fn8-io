@@ -25,6 +25,14 @@
   (.clearRect ctx 0 0 (.-width canvas) (.-height canvas)))
 
 
+
+;; var canvas2 = document.createElement('canvas');
+;; canvas2.width = 150;
+;; canvas2.height = 150;
+;; var context2 = canvas2.getContext('2d');
+
+;; context1.drawImage(canvas2, 0, 0);
+
 (defn display
   "
   Draw graphics buffer into canvas.
@@ -33,11 +41,13 @@
   [coll screen-selection pix-size]
   (if (not= nil (js->clj (.getElementById js/document screen-selection)))
     (let [canvas (.getElementById js/document screen-selection)
-          ctx (.getContext canvas "2d")]
-      (clear-context! ctx canvas)
+          ctx (.getContext canvas "2d")
+          new-canvas (.cloneNode canvas false)
+          new-ctx (.getContext new-canvas "2d")]
+      (clear-context! new-ctx new-canvas)
       (loop [i 0]
         (if (= i 32)
-          coll
+          (.drawImage ctx new-canvas 0 0)
           (do
-            (draw-row 10 64 (* i pix-size) (nth coll i) ctx)
+            (draw-row 10 64 (* i pix-size) (nth coll i) new-ctx)
             (recur (inc i))))))))

@@ -10,6 +10,7 @@
             [fn8-io.config :as config]
             [fn8-io.io.gfx :as gfx]
             [fn8-io.io.keyboard :as keyboard]
+            [fn8-io.io.sound :as sound]
             [fn8-io.machine.machine :as machine]
             [cljs.core.async :as async]
             [fn8-io.io.files :as files])
@@ -35,7 +36,15 @@
 (go-loop []
   (async/<! (async/timeout 17))
   (gfx/display @gfx/gfx-atom "Screen" 10)
-  (swap! machine/loaded update :delay-timer dec)
+  (swap! machine/loaded update :delay-timer machine/dec-to-zero)
+  (recur))
+
+(go-loop []
+  (async/<! (async/timeout 17))
+  (swap! machine/loaded update :sound-timer machine/dec-to-zero)
+  (if (zero? (:sound-timer @machine/loaded))
+    (sound/stop-sound!)
+    (sound/start-sound!))
   (recur))
 
 (go-loop []

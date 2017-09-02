@@ -472,6 +472,12 @@
   [m]
   (mapv vec (partition 64 (apply concat (mapv unpack-to-vector (subvec (:memory m) 0xF00 0x1000))))))
 
+(defn dec-to-zero
+  [val]
+  (if (zero? val)
+    val
+    (dec val)))
+
 (defonce loaded (atom internals))
 (def sim-com (async/chan (async/buffer 1)))
 (def sim-state (atom nil))

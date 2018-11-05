@@ -7,7 +7,8 @@
             [fn8-io.views.screen :as screen]
             [goog.string :as gstring]
             [goog.string.format]
-            [cljs.core.async :as async]))
+            [cljs.core.async :as async])
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
 ;; File view
 (defn obj->vec [obj]
@@ -92,6 +93,27 @@
                               [zmdi-file-button "zmdi-file" #(async/put! sim-com :load) (fn[e](show-files e))]
                               [file-label]]]]])))
 
+(defn register-panel []
+  (let [reg (re-frame/subscribe [:reg])
+        pc (re-frame/subscribe [:pc])
+        memory (re-frame/subscribe [:memory])
+        ]
+    (fn []
+      [re-com/v-box
+       :gap "5px"
+       :width "100%"
+       :align :center
+       :children [[re-com/v-box
+                   :align :center
+                   :gap "2px"
+                   :width "640px"
+                   ;; :height "50px"
+                   :style {:background "#f5f5f5"
+                           :border "1px solid #cfcfcf"}
+                   :children [[:div (str @reg)]
+                              [:div (str @pc)]
+                              [:div (str @memory)]]]]])))
+
 ;; main
 (defn main-panel []
   (let []
@@ -101,4 +123,10 @@
        :width "100%"
        :height "100%"
        :style {:padding-top "20px"}
-       :children [[screen-panel]]])))
+       :children [[screen-panel]
+                  [register-panel]]])))
+
+;; (go-loop []
+;;   (let []
+;;     (async/<! (async/timeout 10))
+;;     (re-frame/dispatch [:state @loaded])))

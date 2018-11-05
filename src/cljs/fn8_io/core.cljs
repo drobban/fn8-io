@@ -33,18 +33,20 @@
   (dev-setup)
   (mount-root))
 
+
 (go-loop []
   (async/<! (async/timeout 17))
-  (gfx/display @gfx/gfx-atom "Screen" 10)
+  (gfx/display (machine/show-gfx-buff @machine/loaded) "Screen" 10)
   (swap! machine/loaded update :delay-timer machine/dec-to-zero)
   (recur))
 
 (go-loop []
   (async/<! (async/timeout 17))
-  (swap! machine/loaded update :sound-timer machine/dec-to-zero)
-  (if (zero? (:sound-timer @machine/loaded))
-    (sound/stop-sound!)
-    (sound/start-sound!))
+  ;; (swap! machine/loaded update :sound-timer machine/dec-to-zero)
+  (swap! machine/loaded update :sound-timer dec)
+  (if (pos? (:sound-timer @machine/loaded))
+    (sound/start-sound!)
+    (sound/stop-sound!))
   (recur))
 
 (go-loop []
@@ -55,10 +57,9 @@
 (go-loop []
   (let []
     (async/<! (async/timeout 1))
+    (re-frame/dispatch [:state @machine/loaded])
     (condp = @machine/sim-state
-      :start (do
-               (swap! machine/loaded #(nth (iterate machine/step-machine %) 10))
-               (reset! gfx/gfx-atom (machine/show-gfx-buff @machine/loaded)))
+      :start (swap! machine/loaded #(nth (iterate machine/step-machine %) 10))
       :load (let [file (async/<! files/done-file)
                   file-name (async/<! files/name-chan)]
               (reset! machine/loaded machine/internals)

@@ -317,7 +317,7 @@
   (if-let [input (:input m)]
     (-> m
         (assoc :input nil)
-        (assoc-in [:vreg 0] input))
+        (assoc-in [:vreg x] input))
     (assoc m :pc (- (:pc m) 2))))
 
 (defn set-delay

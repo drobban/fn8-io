@@ -36,3 +36,19 @@
  :active-panel
  (fn [db _]
    (:active-panel db)))
+
+(re-frame/reg-sub
+ :reg
+ (fn [db _]
+   (get-in db [:loaded :vreg])))
+
+(re-frame/reg-sub
+ :pc
+ (fn [db _]
+   (get-in db [:loaded :pc])))
+
+(re-frame/reg-sub
+ :memory
+ (fn [db _]
+   (get-in db [:loaded :memory])))
+

@@ -24,3 +24,9 @@
  trim-v
  (fn [db [tab]]
    (assoc db :tab tab)))
+
+(register-handler
+ :state
+ trim-v
+ (fn [db [loaded]]
+   (assoc db :loaded loaded)))
